@@ -1,7 +1,7 @@
 /* 
  * tds.c - code to handle database connections to TDS servers
  *
- * this file is part of GLADD
+ * this file is part of GLADDB
  *
  * Copyright (c) 2012, 2013 Brett Sheffield <brett@gladserv.com>
  *
