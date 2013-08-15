@@ -1,0 +1,5 @@
+gladdb
+
+Used by gladd and gladbooks for database access.
+
+Supports postgresql, mysql, ldap and tds databases.
