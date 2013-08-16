@@ -77,6 +77,9 @@ int db_insert_ldap(db_t *db, char *resource, keyval_t *data);
 int db_insert_sql(db_t *db, char *resource, keyval_t *data);
 int db_test_bind(db_t *db, char *bindstr, char *bindattr,
         char *user, char *pass);
+field_t * db_field(row_t *row, char *fname);
+void db_free();
+db_t *db_get(db_t *dbs, char *alias);
 void free_fields(field_t *f);
 void liberate_rows(row_t *r);
 

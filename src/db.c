@@ -663,6 +663,57 @@ int db_test_bind(db_t *db, char *bindstr, char *bindattr,
         return 0;
 }
 
+/* return field with name fname from provided row */
+field_t * db_field(row_t *row, char *fname)
+{
+        field_t *f;
+        
+        f = row->fields;
+        while (f != NULL) {
+                if (strcmp(fname, f->fname) == 0)
+                        return f;
+                f = f->next;
+        }
+
+        return f;
+}
+
+/* free database struct */
+void db_free(db_t *dbs)
+{
+        db_t *d;
+        db_t *tmp;
+
+        d = dbs;
+        while (d != NULL) {
+                free(d->alias);
+                free(d->type);
+                free(d->host);
+                free(d->db);
+                free(d->user);
+                free(d->pass);
+                tmp = d;
+                d = d->next;
+                free(tmp);
+        }
+        dbs = NULL;
+}
+
+/* return the db_t pointer for this db alias */
+db_t *db_get(db_t *dbs, char *alias)
+{
+        db_t *db;
+
+        db = dbs;
+        while (db != NULL) {
+                if (strcmp(alias, db->alias) == 0)
+                        return db;
+                db = db->next;
+        }
+
+        return NULL; /* db not found */
+}
+
 /* free field_t struct */
 void free_fields(field_t *f)
 {
