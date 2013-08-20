@@ -81,6 +81,7 @@ int db_disconnect_tds(db_t *db)
 {
         if (db->conn != NULL) dbclose(db->conn);
         dbexit();
+        db->conn = NULL;
         return 0;
 }
 

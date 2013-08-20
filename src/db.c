@@ -179,6 +179,9 @@ int db_disconnect(db_t *db)
                         "No database info supplied to db_disconnect()\n");
                 return -1;
         }
+        if (db->conn == NULL) {
+                return 0;
+        }
         if (strcmp(db->type, "pg") == 0) {
                 return db_disconnect_pg(db);
         }
@@ -207,6 +210,7 @@ int db_disconnect_ldap(db_t *db)
 {
         int rc;
         rc = ldap_unbind(db->conn);
+        db->conn = NULL;
         return 0;
 }
 
@@ -215,6 +219,7 @@ int db_disconnect_my(db_t *db)
 {
         mysql_close(db->conn);
         mysql_library_end();
+        db->conn = NULL;
 
         return 0;
 }
@@ -223,6 +228,7 @@ int db_disconnect_my(db_t *db)
 int db_disconnect_pg(db_t *db)
 {
         PQfinish(db->conn);
+        db->conn = NULL;
 
         return 0;
 }
@@ -675,7 +681,7 @@ field_t * db_field(row_t *row, char *fname)
                 f = f->next;
         }
 
-        return f;
+        return '\0';
 }
 
 /* free database struct */
