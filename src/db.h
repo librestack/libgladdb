@@ -25,7 +25,7 @@
 
 typedef struct db_t {
         char *alias; /* a convenient handle to refer to this db by */
-        char *type;  /* "pg" = postgres only supported at present */
+        char *type;  /* type of database: pg, my, ldap, tds */
         char *host;  /* hostname or ip for this database eg. "localhost" */
         char *db;    /* name of the database */
         char *user;  /* username (mysql) */
