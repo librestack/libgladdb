@@ -208,9 +208,17 @@ int db_disconnect(db_t *db)
 /* disconnect from a mysql db */
 int db_disconnect_ldap(db_t *db)
 {
-        int rc;
-        rc = ldap_unbind(db->conn);
-        db->conn = NULL;
+        if (db->conn != NULL) {
+		int rc = ldap_unbind(db->conn);
+		if (rc != LDAP_SUCCESS) {
+                	syslog(LOG_ERR, "LDAP unbind error: %s (%d)",
+                        ldap_err2string(rc), rc);
+		}
+        	db->conn = NULL;
+	}
+	else {
+                syslog(LOG_ERR, "Null pointer passed to LDAP unbind");
+	}
         return 0;
 }
 
