@@ -249,11 +249,12 @@ int db_fetch_all_tds(db_t *db, char *sql, field_t *filter, row_t **rows,
 
                 /* row count */
                 if (DBCOUNT(dbproc) > -1)
-                        fprintf(stderr, "%d rows affected\n", DBCOUNT(dbproc));
+                        syslog(LOG_DEBUG, "%d rows affected", DBCOUNT(dbproc));
 
                 /* check return status */
                 if (dbhasretstat(dbproc) == TRUE) {
-                        printf("Procedure returned %d\n", dbretstatus(dbproc));
+                        syslog(LOG_DEBUG, "Procedure returned %d",
+                                                        dbretstatus(dbproc));
                 }
         }
         
