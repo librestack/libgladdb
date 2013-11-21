@@ -247,10 +247,7 @@ int db_fetch_all_tds(db_t *db, char *sql, field_t *filter, row_t **rows,
                 free(columns);
 
                 /* row count */
-                if (DBCOUNT(dbproc) > -1) {
-                        (*rowc) = DBCOUNT(dbproc);
-                        syslog(LOG_DEBUG, "%d rows affected", DBCOUNT(dbproc));
-                }
+                if (DBCOUNT(dbproc) > -1) (*rowc) = DBCOUNT(dbproc);
 
                 /* check return status */
                 if (dbhasretstat(dbproc) == TRUE) {
