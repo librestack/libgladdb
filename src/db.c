@@ -517,7 +517,8 @@ int db_fetch_all_pg(db_t *db, char *sql, field_t *filter, row_t **rows,
         }
 
         res = PQexec(db->conn, sql);
-        if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        int status = PQresultStatus(res);
+        if (status != PGRES_TUPLES_OK && status != PGRES_COMMAND_OK) {
                 syslog(LOG_ERR, "query failed: %s", 
                         PQerrorMessage(db->conn));
                 return -1;
