@@ -303,7 +303,8 @@ int db_exec_sql_pg(db_t *db, char *sql)
         PGresult *res;
 
         res = PQexec(db->conn, sql);
-        if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        int status = PQresultStatus(res);
+        if (status != PGRES_TUPLES_OK && status != PGRES_COMMAND_OK) {
                 syslog(LOG_ERR,
                        "SQL exec failed: %s", PQerrorMessage(db->conn));
                 PQclear(res);
