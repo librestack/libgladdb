@@ -36,7 +36,7 @@ LIBNAME=gladdb
 LIBFILE=lib${LIBNAME}.so
 
 ${LIBFILE}.1.0: tds.o db.o
-	${CC} ${CFLAGS} -shared -W1,-soname,${LIBFILE}.1 -o ${LIBFILE}.1.0 tds.o db.o
+	${CC} ${CFLAGS} -shared -Wl,-soname,${LIBFILE}.1 -o ${LIBFILE}.1.0 tds.o db.o
 
 db.o: db.c db.h
 	${CC} ${CFLAGS} -fpic ${INCLUDES} -c db.c ${LIBS}
