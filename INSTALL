@@ -1,0 +1,9 @@
+INSTALL
+
+== Ubuntu 14.04 LTS ("Trusty") ==
+
+# install required libraries
+apt-get install libpq5 libpq-dev
+apt-get install libmysqlclient18 libmysqlclient-dev
+apt-get install freetds-common freetds-dev libsybdb5
+apt-get install libldap2-dev
