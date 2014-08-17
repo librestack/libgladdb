@@ -24,13 +24,22 @@
 #define LDAP_DEPRECATED 1
 #include "db.h"
 
+#ifndef D_NLDAP
+#include "ldap.h"
+#endif
+
+#ifndef D_NMY
+#include "my.h"
+#endif
+
+#ifndef D_NPG
+#include "pg.h"
+#endif
+
 #ifndef D_NTDS
 #include "tds.h"
 #endif
 
-#include <ldap.h>
-#include <libpq-fe.h>
-#include <mysql.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -46,111 +55,37 @@ int db_connect(db_t *db)
                 syslog(LOG_ERR, "No database info supplied to db_connect()\n");
                 return -1;
         }
+#ifndef _NPG
         if (strcmp(db->type, "pg") == 0) {
                 return db_connect_pg(db);
         }
-        else if (strcmp(db->type, "my") == 0) {
+#endif
+#ifndef _NMY
+        if (strcmp(db->type, "my") == 0) {
                 return db_connect_my(db);
         }
+#endif
 #ifndef _NTDS
-        else if (strcmp(db->type, "tds") == 0) {
+        if (strcmp(db->type, "tds") == 0) {
                 return db_connect_tds(db);
         }
 #endif
-        else if (strcmp(db->type, "ldap") == 0) {
+#ifndef _NLDAP
+        if (strcmp(db->type, "ldap") == 0) {
                 return db_connect_ldap(db);
         }
-        else {
-                syslog(LOG_ERR, 
-                        "Invalid database type '%s' passed to db_connect()\n", 
-                        db->type);
-                return -1;
-        }
-        return 0;
-}
-
-/* connect to ldap */
-int db_connect_ldap(db_t *db)
-{
-        LDAP *l;
-        int rc;
-        int protocol = LDAP_VERSION3;
-
-        rc = ldap_initialize(&l, db->host);
-        if (rc != LDAP_SUCCESS) {
-                syslog(LOG_DEBUG,
-                  "Could not create LDAP session handle for URI=%s (%d): %s\n",
-                  db->host, rc, ldap_err2string(rc));
-                return -1;
-        }
-        syslog(LOG_DEBUG, "ldap_initialise() successful");
-
-        /* Ensure we use LDAP v3 */
-        rc = ldap_set_option(l, LDAP_OPT_PROTOCOL_VERSION, &protocol);
-
-        db->conn = l;
-
-        return 0;
-}
-
-/* connect to mysql database */
-int db_connect_my(db_t *db)
-{
-        MYSQL *conn;
-
-        conn = mysql_init(NULL);
-        if (conn == NULL) {
-                syslog(LOG_ERR, "%u: %s\n", mysql_errno(conn),
-                                            mysql_error(conn));
-                return -1;
-        }
-
-        if (mysql_real_connect(conn, db->host, db->user, db->pass, db->db,
-                                                        0, NULL, 0) == NULL)
-        {
-                syslog(LOG_ERR, "%u: %s\n", mysql_errno(conn),
-                                            mysql_error(conn));
-                return -1;
-        }
-        db->conn = conn;
-
-        return 0;
-}
-
-/* connect to a postgresql database */
-int db_connect_pg(db_t *db)
-{
-        char *conninfo;
-        PGconn *conn;
-        int retval = 0;
-
-        if (asprintf(&conninfo,
-                "host = %s dbname = %s", db->host, db->db) == -1)
-        {
-                fprintf(stderr, 
-                        "asprintf failed for conninfo in db_connect_pg()\n");
-                return -2;
-        }
-        conn = PQconnectdb(conninfo);
-        free(conninfo);
-        if (PQstatus(conn) != CONNECTION_OK)
-        {
-                syslog(LOG_ERR, "connection to database failed.\n");
-                syslog(LOG_DEBUG, "%s", PQerrorMessage(conn));
-                fprintf(stderr, "%s", PQerrorMessage(conn));
-                retval = PQstatus(conn);
-                PQfinish(conn);
-                return retval;
-        }
-        db->conn = conn;
-        return 0;
+#endif
+        syslog(LOG_ERR,
+                "Invalid database type '%s' passed to db_connect()\n",
+                db->type);
+        return -1;
 }
 
 /* wrapper for the database-specific db creation functions */
 int db_create(db_t *db)
 {
         if (db == NULL) {
-                fprintf(stderr, 
+                fprintf(stderr,
                         "No database info supplied to db_create()\n");
                 return -1;
         }
@@ -158,16 +93,10 @@ int db_create(db_t *db)
                 return db_create_pg(db);
         }
         else {
-                fprintf(stderr, 
+                fprintf(stderr,
                     "Invalid database type '%s' passed to db_create()\n",
                     db->type);
         }
-        return 0;
-}
-
-/* TODO: db_create_pg() */
-int db_create_pg(db_t *db)
-{
         return 0;
 }
 
@@ -175,70 +104,37 @@ int db_create_pg(db_t *db)
 int db_disconnect(db_t *db)
 {
         if (db == NULL) {
-                fprintf(stderr, 
+                fprintf(stderr,
                         "No database info supplied to db_disconnect()\n");
                 return -1;
         }
         if (db->conn == NULL) {
                 return 0;
         }
+#ifndef _NPG
         if (strcmp(db->type, "pg") == 0) {
                 return db_disconnect_pg(db);
         }
-        else if (strcmp(db->type, "my") == 0) {
+#endif
+#ifndef _NMY
+        if (strcmp(db->type, "my") == 0) {
                 return db_disconnect_my(db);
         }
+#endif
 #ifndef _NTDS
-        else if (strcmp(db->type, "tds") == 0) {
+        if (strcmp(db->type, "tds") == 0) {
                 return db_disconnect_tds(db);
         }
 #endif
-        else if (strcmp(db->type, "ldap") == 0) {
+#ifndef _NLDAP
+        if (strcmp(db->type, "ldap") == 0) {
                 return db_disconnect_ldap(db);
         }
-        else {
-                fprintf(stderr, 
-                    "Invalid database type '%s' passed to db_disconnect()\n",
-                    db->type);
-                return -1;
-        }
-        return 0;
-}
-
-/* disconnect from a mysql db */
-int db_disconnect_ldap(db_t *db)
-{
-        if (db->conn != NULL) {
-		int rc = ldap_unbind(db->conn);
-		if (rc != LDAP_SUCCESS) {
-                	syslog(LOG_ERR, "LDAP unbind error: %s (%d)",
-                        ldap_err2string(rc), rc);
-		}
-        	db->conn = NULL;
-	}
-	else {
-                syslog(LOG_ERR, "Null pointer passed to LDAP unbind");
-	}
-        return 0;
-}
-
-/* disconnect from a mysql db */
-int db_disconnect_my(db_t *db)
-{
-        mysql_close(db->conn);
-        mysql_library_end();
-        db->conn = NULL;
-
-        return 0;
-}
-
-/* disconnect from a postgresql db */
-int db_disconnect_pg(db_t *db)
-{
-        PQfinish(db->conn);
-        db->conn = NULL;
-
-        return 0;
+#endif
+        fprintf(stderr,
+            "Invalid database type '%s' passed to db_disconnect()\n",
+            db->type);
+        return -1;
 }
 
 /* execute some sql on a database
@@ -248,7 +144,7 @@ int db_exec_sql(db_t *db, char *sql)
         int isconn = 0;
 
         if (db == NULL) {
-                fprintf(stderr, 
+                fprintf(stderr,
                         "No database info supplied to db_exec_sql()\n");
                 return -1;
         }
@@ -262,55 +158,28 @@ int db_exec_sql(db_t *db, char *sql)
                 }
                 isconn = 1;
         }
+#ifndef _NPG
         if (strcmp(db->type, "pg") == 0) {
                 return db_exec_sql_pg(db, sql);
         }
-        else if (strcmp(db->type, "my") == 0) {
+#endif
+#ifndef _NMY
+        if (strcmp(db->type, "my") == 0) {
                 return db_exec_sql_my(db, sql);
         }
+#endif
 #ifndef _NTDS
-        else if (strcmp(db->type, "tds") == 0) {
+        if (strcmp(db->type, "tds") == 0) {
                 return db_exec_sql_tds(db, sql);
         }
-#endif /* _NTDS */
-        else {
-                fprintf(stderr, 
-                    "Invalid database type '%s' passed to db_exec_sql()\n",
-                    db->type);
-        }
+#endif
+        fprintf(stderr,
+            "Invalid database type '%s' passed to db_exec_sql()\n",
+            db->type);
 
         /* leave the connection how we found it */
         if (isconn == 1)
                 db_disconnect(db);
-
-        return 0;
-}
-
-/* execute sql against a mysql db */
-int db_exec_sql_my(db_t *db, char *sql)
-{
-        if (mysql_query(db->conn, sql) != 0) {
-                syslog(LOG_ERR, "%u: %s\n", mysql_errno(db->conn), 
-                                              mysql_error(db->conn));
-                return -1;
-        }
-        return 0;
-}
-
-/* execute sql against a postgresql db */
-int db_exec_sql_pg(db_t *db, char *sql)
-{
-        PGresult *res;
-
-        res = PQexec(db->conn, sql);
-        int status = PQresultStatus(res);
-        if (status != PGRES_TUPLES_OK && status != PGRES_COMMAND_OK) {
-                syslog(LOG_ERR,
-                       "SQL exec failed: %s", PQerrorMessage(db->conn));
-                PQclear(res);
-                return -1;
-        }
-        PQclear(res);
 
         return 0;
 }
@@ -320,277 +189,59 @@ int db_exec_sql_pg(db_t *db, char *sql)
 int db_fetch_all(db_t *db, char *sql, field_t *filter, row_t **rows, int *rowc)
 {
         if (db == NULL) {
-                syslog(LOG_ERR, 
+                syslog(LOG_ERR,
                         "No database info supplied to db_fetch_all()\n");
                 return -1;
         }
+#ifndef _NPG
         if (strcmp(db->type, "pg") == 0) {
                 return db_fetch_all_pg(db, sql, filter, rows, rowc);
         }
-        else if (strcmp(db->type, "my") == 0) {
+#endif
+#ifndef _NMY
+        if (strcmp(db->type, "my") == 0) {
                 return db_fetch_all_my(db, sql, filter, rows, rowc);
         }
+#endif
 #ifndef _NTDS
-        else if (strcmp(db->type, "tds") == 0) {
+        if (strcmp(db->type, "tds") == 0) {
                 return db_fetch_all_tds(db, sql, filter, rows, rowc);
         }
 #endif
-        else if (strcmp(db->type, "ldap") == 0) {
+#ifndef _NLDAP
+        if (strcmp(db->type, "ldap") == 0) {
                 return db_fetch_all_ldap(db, sql, filter, rows, rowc);
         }
-        else {
-                syslog(LOG_ERR, 
-                    "Invalid database type '%s' passed to db_fetch_all()\n",
-                    db->type);
-                return -1;
-        }
-        return 0;
-}
-
-int db_fetch_all_ldap(db_t *db, char *query, field_t *filter, row_t **rows,
-        int *rowc)
-{
-        BerElement *ber;
-        LDAPMessage *msg;
-        LDAPMessage *res = NULL;
-        char *a;
-        char *lfilter = NULL;
-        char *search;
-        char **vals;
-        int i;
-        int rc;
-        field_t *f;
-        field_t *ftmp = NULL;
-        row_t *r;
-        row_t *rtmp = NULL;
-
-        asprintf(&search, "%s,%s", query, db->db);
-        rc = ldap_search_ext_s(db->conn, search, LDAP_SCOPE_SUBTREE,
-                lfilter, NULL, 0, NULL, NULL, LDAP_NO_LIMIT,
-                LDAP_NO_LIMIT, &res);
-        free(search);
-
-        if (rc != LDAP_SUCCESS) {
-                syslog(LOG_DEBUG, "search error: %s (%d)",
-                                ldap_err2string(rc), rc);
-                return -1;
-        }
-        syslog(LOG_DEBUG, "ldap_search_ext_s successful");
-
-        *rowc = ldap_count_messages(db->conn, res);
-        syslog(LOG_DEBUG, "Messages: %i", *rowc);
-
-        /* populate rows and fields */
-        for (msg = ldap_first_entry(db->conn, res); msg != NULL;
-        msg = ldap_next_entry(db->conn, msg))
-        {
-                r = malloc(sizeof(row_t));
-                r->fields = NULL;
-                r->next = NULL;
-                for (a = ldap_first_attribute(db->conn, msg, &ber); a != NULL;
-                a = ldap_next_attribute(db->conn, msg, ber))
-                {
-                        /* attributes may have more than one value - here
-                           we list them all as separate fields */
-                        if ((vals = ldap_get_values(db->conn, msg, a)) != NULL)
-                        {
-                                for (i = 0; vals[i] != NULL; i++) {
-                                        f = malloc(sizeof(field_t));
-                                        f->fname = strdup(a);
-                                        f->fvalue = strdup(vals[i]);
-                                        f->next = NULL;
-                                        if (r->fields == NULL) {
-                                                r->fields = f;
-                                        }
-                                        if (ftmp != NULL) {
-                                                ftmp->next = f;
-                                        }
-                                        ftmp = f;
-                                }
-                                ldap_value_free(vals);
-                        }
-                        ldap_memfree(a);
-                }
-                ldap_memfree(ber);
-                if (rtmp == NULL) {
-                        /* as this is our first row, update the ptr */
-                        *rows = r;
-                }
-                else {
-                        rtmp->next = r;
-                }
-                ftmp = NULL;
-                rtmp = r;
-        }
-        ldap_msgfree(res);
-        return 0;
-}
-
-/* return all results from a SELECT - mysql */
-int db_fetch_all_my(db_t *db, char *sql, field_t *filter, row_t **rows,
-        int *rowc)
-{
-        MYSQL_RES *res;
-        MYSQL_ROW row;
-        MYSQL_FIELD *fields;
-        int i;
-        int nFields;
-        field_t *f;
-        field_t *ftmp = NULL;
-        row_t *r;
-        row_t *rtmp = NULL;
-        char *sqltmp;
-        char *join;
-
-        *rowc = 0;
-
-        if (filter != NULL) {
-                join = (strcasestr(sql, "WHERE") == NULL) ? "WHERE" : "AND";
-                sqltmp = strdup(sql);
-                asprintf(&sql, "%s %s %s=\"%s\"", sqltmp, join, filter->fname,
-                        filter->fvalue);
-                free(sqltmp);
-        }
-
-        if (mysql_query(db->conn, sql) != 0) {
-                syslog(LOG_ERR, "%u: %s\n%s", mysql_errno(db->conn), 
-                                              mysql_error(db->conn), sql);
-                return -1;
-        }
-
-        res = mysql_store_result(db->conn);
-        *rowc = mysql_num_rows(res);
-
-        /* populate rows and fields */
-        fields = mysql_fetch_fields(res);
-        nFields = mysql_num_fields(res);
-        while ((row = mysql_fetch_row(res))) {
-                r = malloc(sizeof(row_t));
-                r->fields = NULL;
-                r->next = NULL;
-                for (i = 0; i < nFields; i++) {
-                        f = malloc(sizeof(field_t));
-                        f->fname = strdup(fields[i].name);
-                        asprintf(&f->fvalue, "%s", row[i] ? row[i] : "NULL");
-                        f->next = NULL;
-                        if (r->fields == NULL) {
-                                r->fields = f;
-                        }
-                        if (ftmp != NULL) {
-                                ftmp->next = f;
-                        }
-                        ftmp = f;
-                }
-                if (rtmp == NULL) {
-                        /* as this is our first row, update the ptr */
-                        *rows = r;
-                }
-                else {
-                        rtmp->next = r;
-                }
-                ftmp = NULL;
-                rtmp = r;
-        }
-        mysql_free_result(res);
-
-        return 0;
-}
-
-/* return all results from a SELECT - postgres */
-int db_fetch_all_pg(db_t *db, char *sql, field_t *filter, row_t **rows,
-        int *rowc)
-{
-        PGresult *res;
-        int i, j;
-        int nFields;
-        field_t *f;
-        field_t *ftmp = NULL;
-        row_t *r;
-        row_t *rtmp = NULL;
-        char *sqltmp;
-
-        if (filter != NULL) {
-                sqltmp = strdup(sql);
-                asprintf(&sql, "%s WHERE %s='%s'", sqltmp, filter->fname,
-                        filter->fvalue);
-                free(sqltmp);
-        }
-
-        res = PQexec(db->conn, sql);
-        int status = PQresultStatus(res);
-        if (status != PGRES_TUPLES_OK && status != PGRES_COMMAND_OK) {
-                syslog(LOG_ERR, "query failed: %s", 
-                        PQerrorMessage(db->conn));
-                return -1;
-        }
-
-        /* populate rows and fields */
-        nFields = PQnfields(res);
-        for (j = 0; j < PQntuples(res); j++) {
-                r = malloc(sizeof(row_t));
-                r->fields = NULL;
-                r->next = NULL;
-                for (i = 0; i < nFields; i++) {
-                        f = malloc(sizeof(field_t));
-                        f->fname = strdup(PQfname(res, i));
-                        f->fvalue = strdup(PQgetvalue(res, j, i));
-                        f->next = NULL;
-                        if (r->fields == NULL) {
-                                r->fields = f;
-                        }
-                        if (ftmp != NULL) {
-                                ftmp->next = f;
-                        }
-                        ftmp = f;
-                }
-                if (rtmp == NULL) {
-                        /* as this is our first row, update the ptr */
-                        *rows = r;
-                }
-                else {
-                        rtmp->next = r;
-                }
-                ftmp = NULL;
-                rtmp = r;
-        }
-        *rowc = PQntuples(res);
-
-        PQclear(res);
-
-        return 0;
+#endif
+        syslog(LOG_ERR,
+            "Invalid database type '%s' passed to db_fetch_all()\n",
+            db->type);
+        return -1;
 }
 
 /* database agnostic resource insertion */
 int db_insert(db_t *db, char *resource, keyval_t *data)
 {
         if (db == NULL) {
-                syslog(LOG_ERR, 
+                syslog(LOG_ERR,
                         "No database info supplied to db_insert()\n");
                 return -1;
         }
-        /* TODO: field validation */
+#if !defined(_NPG) || !defined(_NMY) || !defined(_NTDS)
         if ((strcmp(db->type, "pg") == 0) || (strcmp(db->type, "my") == 0) ||
             (strcmp(db->type, "tds") == 0))
         {
                 return db_insert_sql(db, resource, data);
         }
-        else if (strcmp(db->type, "ldap") == 0) {
+#endif
+#ifndef _NLDAP
+        if (strcmp(db->type, "ldap") == 0) {
                 return db_insert_ldap(db, resource, data);
         }
-        else {
-                syslog(LOG_ERR, 
-                    "Invalid database type '%s' passed to db_insert()\n",
-                    db->type);
-                return -1;
-        }
-        return 0;
-}
-
-/* ldap add */
-int db_insert_ldap(db_t *db, char *resource, keyval_t *data)
-{
-        /* TODO */
-        return 0;
+#endif
+        syslog(LOG_ERR, "Invalid database type '%s' passed to db_insert()\n",
+                db->type);
+        return -1;
 }
 
 /* INSERT into sql database */
@@ -604,11 +255,11 @@ int db_insert_sql(db_t *db, char *resource, keyval_t *data)
         char quot = '\'';
         int rval;
         int isconn = 0;
-      
+
         /* use backticks to quote mysql */
         if (strcmp(db->type, "my") == 0)
                 quot = '"';
-                
+
         /* build INSERT sql from supplied data */
         while (data != NULL) {
                 fprintf(stderr, "%s = %s\n", data->key, data->value);
@@ -651,39 +302,11 @@ int db_insert_sql(db_t *db, char *resource, keyval_t *data)
         return rval;
 }
 
-/* test credentials against ldap */
-int db_test_bind(db_t *db, char *bindstr, char *bindattr,
-        char *user, char *pass)
-{
-        char *binddn;
-        int rc;
-
-        if (db == NULL) {
-                syslog(LOG_DEBUG, "NULL db passed to db_test_bind()");
-                return -1;
-        }
-        
-        db_connect_ldap(db);
-        asprintf(&binddn, "%s=%s,%s,%s", bindattr, user, bindstr, db->db);
-        fprintf(stderr, "%s\n", binddn);
-        rc = ldap_simple_bind_s(db->conn, binddn, pass);
-        free(binddn);
-        if (rc != LDAP_SUCCESS) {
-                syslog(LOG_DEBUG, "Bind error: %s (%d)",
-                        ldap_err2string(rc), rc);
-                db_disconnect_ldap(db);
-                return -2;
-        }
-        db_disconnect_ldap(db);
-
-        return 0;
-}
-
 /* return field with name fname from provided row */
 field_t * db_field(row_t *row, char *fname)
 {
         field_t *f;
-        
+
         f = row->fields;
         while (f != NULL) {
                 if (strcmp(fname, f->fname) == 0)

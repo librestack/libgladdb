@@ -19,9 +19,6 @@
  * along with this program (see the file COPYING in the distribution).
  * If not, see <http://www.gnu.org/licenses/>.
  */
-
-#ifndef D_NTDS
-
 #define _GNU_SOURCE
 #include "db.h"
 #include <assert.h>
@@ -255,7 +252,7 @@ int db_fetch_all_tds(db_t *db, char *sql, field_t *filter, row_t **rows,
                                                         dbretstatus(dbproc));
                 }
         }
-        
+
         return 0;
 }
 
@@ -304,5 +301,3 @@ int err_handler(DBPROCESS * dbproc, int severity, int dberr, int oserr,
         }
         return INT_CANCEL;
 }
-
-#endif /* D_NTDS */

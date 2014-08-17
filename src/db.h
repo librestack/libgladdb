@@ -52,36 +52,17 @@ typedef struct row_t {
 } row_t;
 
 int db_connect(db_t *db);
-int db_connect_ldap(db_t *db);
-int db_connect_my(db_t *db);
-int db_connect_pg(db_t *db);
 int db_create(db_t *db);
-int db_create_pg(db_t *db);
 int db_disconnect(db_t *db);
-int db_disconnect_ldap(db_t *db);
-int db_disconnect_my(db_t *db);
-int db_disconnect_pg(db_t *db);
 int db_exec_sql(db_t *db, char *sql);
-int db_exec_sql_my(db_t *db, char *sql);
-int db_exec_sql_pg(db_t *db, char *sql);
 int db_fetch_all(db_t *db, char *sql, field_t *filter, row_t **rows,
         int *rowc);
-int db_fetch_all_ldap(db_t *db, char *query, field_t *filter, row_t **rows,
-        int *rowc);
-int db_fetch_all_my(db_t *db, char *sql, field_t *filter, row_t **rows,
-        int *rowc);
-int db_fetch_all_pg(db_t *db, char *sql, field_t *filter, row_t **rows,
-        int *rowc);
 int db_insert(db_t *db, char *resource, keyval_t *data);
-int db_insert_ldap(db_t *db, char *resource, keyval_t *data);
 int db_insert_sql(db_t *db, char *resource, keyval_t *data);
-int db_test_bind(db_t *db, char *bindstr, char *bindattr,
-        char *user, char *pass);
 field_t * db_field(row_t *row, char *fname);
 void db_free();
 db_t *db_get(db_t *dbs, char *alias);
 void free_fields(field_t *f);
 void liberate_rows(row_t *r);
-
 
 #endif /* __GLADDB_DB_H__ */
