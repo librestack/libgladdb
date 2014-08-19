@@ -96,11 +96,18 @@ tds.o: tds.c tds.h
 	${CC} $(CFLAGS) -fpic $(INCLUDES) -c tds.c $(LIBS)
 endif
 
-.PHONY: clean
+.PHONY: clean test
 
 clean:
 	rm -f *.so*
 	rm -f *.o
+	rm -f ${LIBNAME}_test_ldap
+
+test: clean $(OBJECTFILES)
+	${CC} $(CFLAGS) ${INCLUDES} -o ${LIBNAME}_test_ldap ldap_test.c $(OBJECTFILES) $(LIBS)
+	@echo "Running tests..."
+	@./${LIBNAME}_test_ldap || echo "LDAP test failed"
+	@echo "Tests complete."
 
 ${INCLUDEDIR}:
 	mkdir ${INCLUDEDIR}

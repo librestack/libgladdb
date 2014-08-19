@@ -1,5 +1,5 @@
 /* 
- * ldap.c - code to handle database connections etc.
+ * ldap.c - code to handle ldap connections
  *
  * this file is part of GLADDB
  *
