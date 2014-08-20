@@ -23,11 +23,14 @@
 #ifndef __GLADDB_LDAP_H__
 #define __GLADDB_LDAP_H__ 1
 
+#include <ldap.h>
+
 int db_connect_ldap(db_t *db);
 int db_disconnect_ldap(db_t *db);
 int db_fetch_all_ldap(db_t *db, char *query, field_t *filter, row_t **rows,
         int *rowc);
 int db_insert_ldap(db_t *db, char *resource, keyval_t *data);
+int keyval_to_LDAPMod(keyval_t *kv, LDAPMod **lm);
 int db_test_bind(db_t *db, char *bindstr, char *bindattr,
         char *user, char *pass);
 

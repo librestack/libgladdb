@@ -23,7 +23,6 @@
 #define LDAP_DEPRECATED 1
 #include "db.h"
 #include "ldap.h"
-#include <ldap.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -151,6 +150,15 @@ int db_fetch_all_ldap(db_t *db, char *query, field_t *filter, row_t **rows,
 
 /* ldap add */
 int db_insert_ldap(db_t *db, char *resource, keyval_t *data)
+{
+        /* TODO */
+        return 0;
+}
+
+/* TODO: take struct keyval_t, sort, bundle up duplicate attributes and spit
+   out an LDAPMod array
+*/
+int keyval_to_LDAPMod(keyval_t *kv, LDAPMod **lm)
 {
         /* TODO */
         return 0;

@@ -30,6 +30,8 @@ int ldap_test_db_connect_ldap(db_t *db);
 int ldap_test_db_disconnect_ldap(db_t *db);
 int ldap_test_db_test_bind_good(db_t *db);
 int ldap_test_db_test_bind_bad(db_t *db);
+int ldap_test_keyval_to_LDAPMod();
+int ldap_test_db_insert_ldap(db_t *db);
 int main();
 
 int main()
@@ -65,6 +67,18 @@ int main()
         rc = ldap_test_db_test_bind_bad(db);
         if (rc != 0) goto cleanup_main;
         printf("OK\n");
+
+        printf("ldap_test_keyval_to_LDAPMod...");
+        rc = ldap_test_keyval_to_LDAPMod();
+        if (rc != 0) goto cleanup_main;
+        printf("OK\n");
+
+        /*
+        printf("ldap_test_db_insert_ldap...");
+        rc = ldap_test_db_insert_ldap(db);
+        if (rc != 0) goto cleanup_main;
+        printf("OK\n");
+        */
 
 cleanup_main:
         printf("\n");
@@ -102,4 +116,18 @@ int ldap_test_db_test_bind_bad(db_t *db)
         int rc;
         rc = db_test_bind(db, "ou=people", "uid", "betty", "badpass");
         return (rc == 0) ? 1 : 0;
+}
+
+/* test ldap add */
+int ldap_test_db_insert_ldap(db_t *db)
+{
+        /* TODO */
+        return 0;
+}
+
+/* test keyval to LDAPMod conversion function */
+int ldap_test_keyval_to_LDAPMod()
+{
+        /* TODO */
+        return 0;
 }
