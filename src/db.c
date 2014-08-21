@@ -377,3 +377,19 @@ void liberate_rows(row_t *r)
                 r = next_r;
         }
 }
+
+/* count keyvals and return total and unique counts */
+int count_keyvals(keyval_t *kv, int *total, int *unique)
+{
+        char *last = kv->key;
+        if (kv != NULL) (*unique) = 1;
+        while (kv != NULL) {
+                if (strcmp(last, kv->key) != 0) {
+                        last = kv->key;
+                        (*unique)++;
+                }
+                (*total)++;
+                kv = kv->next;
+        }
+        return *total;
+}
