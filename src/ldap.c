@@ -151,8 +151,24 @@ int db_fetch_all_ldap(db_t *db, char *query, field_t *filter, row_t **rows,
 /* ldap add */
 int db_insert_ldap(db_t *db, char *resource, keyval_t *data)
 {
-        /* TODO */
-        return 0;
+        LDAPMod **lmod;
+        int rc;
+
+        rc = keyval_to_LDAPMod(data, &lmod);
+        if (rc == 0) {
+                ldap_mods_free(lmod, 1);
+                return 1;
+        }
+        rc = db_connect_ldap(db);
+        if (rc != 0) goto db_insert_ldap_cleanup;
+        rc = ldap_simple_bind_s(db->conn, db->user, db->pass);
+        if (rc != 0) goto db_insert_ldap_cleanup;
+        rc = ldap_add_s(db->conn, resource, lmod);
+        db_disconnect_ldap(db);
+
+db_insert_ldap_cleanup:
+        ldap_mods_free(lmod, 1);
+        return (rc == LDAP_SUCCESS) ? 0 : 1;
 }
 
 /* take struct keyval_t, bundle up duplicate attributes and spit
@@ -160,23 +176,23 @@ int db_insert_ldap(db_t *db, char *resource, keyval_t *data)
 */
 int keyval_to_LDAPMod(keyval_t *kv, LDAPMod ***lm)
 {
+        if (kv == NULL) return 1;
         keyval_t *k = kv;
         char *last = kv->key;
         char **vals;
-        if (kv == NULL) return 0;
         int c = 0;
         int i = 0;
         int total = 0;
         int unique = 0;
 
         count_keyvals(kv, &total, &unique);
-        *lm = calloc(1, sizeof(LDAPMod));
+        *lm = calloc(total, sizeof(LDAPMod));
         vals = calloc(total, sizeof(char *));
         k = kv;
         while (k != NULL) {
                 if (strcmp(last, k->key) != 0 || k->next == NULL) {
                         /* we have all of our values */
-                        if (k->next == NULL) {
+                        if (k->next == NULL && strcmp(last, k->key) == 0) {
                                 vals[i++] = strdup(k->value);
                         }
                         (*lm)[c] = calloc(1, sizeof(LDAPMod));
@@ -185,6 +201,17 @@ int keyval_to_LDAPMod(keyval_t *kv, LDAPMod ***lm)
                         if (k->next != NULL) {
                                 vals = calloc(total, sizeof(char *));
                         }
+                        else {
+                                if (strcmp(last, k->key) != 0) {
+                                        c++;
+                                        (*lm)[c] = calloc(1, sizeof(LDAPMod));
+                                        (*lm)[c]->mod_type = strdup(k->key);
+                                        vals = calloc(1, sizeof(char *));
+                                        vals[0] = strdup(k->value);
+                                        (*lm)[c]->mod_values = vals;
+                                        break;
+                                }
+                        }
                         last = k->key;
                         c++;
                         i = 0;
@@ -192,7 +219,6 @@ int keyval_to_LDAPMod(keyval_t *kv, LDAPMod ***lm)
                 if (k->next != NULL) vals[i++] = strdup(k->value);
                 k = k->next;
         }
-        (*lm)[c] = NULL;
 
         return unique;
 }

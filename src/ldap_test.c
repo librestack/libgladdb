@@ -32,7 +32,7 @@ int ldap_test_db_disconnect_ldap(db_t *db);
 int ldap_test_db_test_bind_good(db_t *db);
 int ldap_test_db_test_bind_bad(db_t *db);
 int ldap_test_keyval_to_LDAPMod();
-int ldap_test_db_insert_ldap(db_t *db);
+int ldap_test_db_insert_ldap();
 int main();
 
 int main()
@@ -74,12 +74,10 @@ int main()
         if (rc != 0) goto cleanup_main;
         printf("OK\n");
 
-        /*
         printf("ldap_test_db_insert_ldap...");
-        rc = ldap_test_db_insert_ldap(db);
+        rc = ldap_test_db_insert_ldap();
         if (rc != 0) goto cleanup_main;
         printf("OK\n");
-        */
 
 cleanup_main:
         printf("\n");
@@ -120,10 +118,51 @@ int ldap_test_db_test_bind_bad(db_t *db)
 }
 
 /* test ldap add */
-int ldap_test_db_insert_ldap(db_t *db)
+int ldap_test_db_insert_ldap()
 {
-        /* TODO */
-        return 0;
+        /*
+        dn: uid=wilma,ou=People,dc=gladserv,dc=com
+        uid: wilma
+        objectClass: inetOrgPerson
+        objectClass: posixAccount
+        objectClass: shadowAccount
+        objectClass: inetLocalMailRecipient
+        uidNumber: 9646
+        gidNumber: 1100
+        cn: Wilma
+        sn: Flintstone
+        homeDirectory: /home/wilma
+        loginShell: /sbin/nologin
+        gecos: Wilma Flintstone
+        mail: wilma@gladserv.com
+        */
+        struct db_t *db = malloc(sizeof (db_t));
+        db->alias = "ldapdb";
+        db->type = "ldap";
+        db->host = "ldap://ldaptestserver";
+        db->db = "dc=gladserv,dc=com";
+        db->user = "cn=testadmin,dc=gladserv,dc=com";
+        db->pass = "mytestpass";
+        db->conn = NULL;
+        db->next = NULL;
+int rc;
+        keyval_t *kv;
+        keyval_t attr12 = { "mail", "wilma@gladserv.com", NULL };
+        keyval_t attr11 = { "gecos", "Wilma", &attr12 };
+        keyval_t attr10 = { "loginShell", "/sbin/nologin", &attr11 };
+        keyval_t attr9 = { "homeDirectory", "/home/wilma", &attr10 };
+        keyval_t attr8 = { "sn", "Flintstone", &attr9 };
+        keyval_t attr7 = { "cn", "Wilma", &attr8 };
+        keyval_t attr6 = { "gidNumber", "1100", &attr7 };
+        keyval_t attr5 = { "uidNumber", "9646", &attr6 };
+        keyval_t attr4 = { "objectClass", "inetLocalMailRecipient", &attr5 };
+        keyval_t attr3 = { "objectClass", "shadowAccount", &attr4 };
+        keyval_t attr2 = { "objectClass", "posixAccount", &attr3 };
+        keyval_t attr1 = { "objectClass", "inetOrgPerson", &attr2 };
+        keyval_t attr0 = { "uid", "wilma", &attr1 };
+        kv = &attr0;
+        rc = db_insert_ldap(db, "uid=wilma,ou=people,dc=gladserv,dc=com", kv);
+        return rc;
 }
 
 /* test keyval to LDAPMod conversion function */
@@ -153,8 +192,6 @@ int ldap_test_keyval_to_LDAPMod()
         l0[0] = &lm_uid;
         l0[1] = &lm_objectClass;
         l0[2] = NULL;
-
-        printf("\n");
 
         /* call the conversion function */
         c = keyval_to_LDAPMod(kv, &lm);
