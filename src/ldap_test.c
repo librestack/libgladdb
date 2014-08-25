@@ -136,6 +136,7 @@ int ldap_test_db_insert_ldap()
         gecos: Wilma Flintstone
         mail: wilma@gladserv.com
         */
+        int rc;
         struct db_t *db = malloc(sizeof (db_t));
         db->alias = "ldapdb";
         db->type = "ldap";
@@ -145,7 +146,6 @@ int ldap_test_db_insert_ldap()
         db->pass = "mytestpass";
         db->conn = NULL;
         db->next = NULL;
-int rc;
         keyval_t *kv;
         keyval_t attr12 = { "mail", "wilma@gladserv.com", NULL };
         keyval_t attr11 = { "gecos", "Wilma", &attr12 };
