@@ -162,6 +162,7 @@ int rc;
         keyval_t attr0 = { "uid", "wilma", &attr1 };
         kv = &attr0;
         rc = db_insert_ldap(db, "uid=wilma,ou=people,dc=gladserv,dc=com", kv);
+        free(db);
         return rc;
 }
 

@@ -164,9 +164,9 @@ int db_insert_ldap(db_t *db, char *resource, keyval_t *data)
         rc = ldap_simple_bind_s(db->conn, db->user, db->pass);
         if (rc != 0) goto db_insert_ldap_cleanup;
         rc = ldap_add_s(db->conn, resource, lmod);
-        db_disconnect_ldap(db);
 
 db_insert_ldap_cleanup:
+        db_disconnect_ldap(db);
         ldap_mods_free(lmod, 1);
         return (rc == LDAP_SUCCESS) ? 0 : 1;
 }
@@ -206,7 +206,7 @@ int keyval_to_LDAPMod(keyval_t *kv, LDAPMod ***lm)
                                         c++;
                                         (*lm)[c] = calloc(1, sizeof(LDAPMod));
                                         (*lm)[c]->mod_type = strdup(k->key);
-                                        vals = calloc(1, sizeof(char *));
+                                        vals = calloc(2, sizeof(char *));
                                         vals[0] = strdup(k->value);
                                         (*lm)[c]->mod_values = vals;
                                         break;
