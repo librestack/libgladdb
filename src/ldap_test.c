@@ -25,6 +25,7 @@
 #include <ldap.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int ldap_test_db_connect_ldap(db_t *db);
 int ldap_test_db_disconnect_ldap(db_t *db);
@@ -128,6 +129,48 @@ int ldap_test_db_insert_ldap(db_t *db)
 /* test keyval to LDAPMod conversion function */
 int ldap_test_keyval_to_LDAPMod()
 {
-        /* TODO */
-        return 0;
+        int c = 0;
+        int rc = 0;
+        LDAPMod **lm = NULL;
+
+        /* keyval to feed into keyval_to_LDAPMod() */
+        keyval_t *kv;
+        keyval_t attr3 = { "objectClass", "widgets", NULL };
+        keyval_t attr2 = { "objectClass", "people", &attr3 };
+        keyval_t attr1 = { "objectClass", "top", &attr2 };
+        keyval_t attr0 = { "uid", "ldapadduser", &attr1 };
+        kv = &attr0;
+
+        /* the LDAPMod we expect back */
+        LDAPMod *l0[4];
+        char *vals_uid[] = { "ldapadduser", NULL };
+        char *vals_objectClass[] = { "top", "people", "widgets", NULL };
+        LDAPMod lm_uid, lm_objectClass;
+        lm_uid.mod_type = "uid";
+        lm_uid.mod_values = vals_uid;
+        lm_objectClass.mod_type = "objectClass";
+        lm_objectClass.mod_values = vals_objectClass;
+        l0[0] = &lm_uid;
+        l0[1] = &lm_objectClass;
+        l0[2] = NULL;
+
+        printf("\n");
+
+        /* call the conversion function */
+        c = keyval_to_LDAPMod(kv, &lm);
+
+        /* check return value */
+        if (c != 2) return 1;
+
+        /* compare LDAPMods */
+        if (lm == NULL) {
+                rc = 1;
+                goto ldap_test_keyval_to_LDAPMod_cleanup;
+        }
+        rc = compare_LDAPMod(l0, lm);
+
+ldap_test_keyval_to_LDAPMod_cleanup:
+        ldap_mods_free(lm, 1);
+
+        return rc;
 }

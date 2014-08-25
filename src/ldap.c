@@ -155,13 +155,78 @@ int db_insert_ldap(db_t *db, char *resource, keyval_t *data)
         return 0;
 }
 
-/* TODO: take struct keyval_t, sort, bundle up duplicate attributes and spit
+/* take struct keyval_t, bundle up duplicate attributes and spit
    out an LDAPMod array
 */
-int keyval_to_LDAPMod(keyval_t *kv, LDAPMod **lm)
+int keyval_to_LDAPMod(keyval_t *kv, LDAPMod ***lm)
 {
-        /* TODO */
-        return 0;
+        keyval_t *k = kv;
+        char *last = kv->key;
+        char **vals;
+        if (kv == NULL) return 0;
+        int c = 0;
+        int i = 0;
+        int total = 0;
+        int unique = 0;
+
+        count_keyvals(kv, &total, &unique);
+        *lm = calloc(1, sizeof(LDAPMod));
+        vals = calloc(total, sizeof(char *));
+        k = kv;
+        while (k != NULL) {
+                if (strcmp(last, k->key) != 0 || k->next == NULL) {
+                        /* we have all of our values */
+                        if (k->next == NULL) {
+                                vals[i++] = strdup(k->value);
+                        }
+                        (*lm)[c] = calloc(1, sizeof(LDAPMod));
+                        (*lm)[c]->mod_type = strdup(last);
+                        (*lm)[c]->mod_values = vals;
+                        if (k->next != NULL) {
+                                vals = calloc(total, sizeof(char *));
+                        }
+                        last = k->key;
+                        c++;
+                        i = 0;
+                }
+                if (k->next != NULL) vals[i++] = strdup(k->value);
+                k = k->next;
+        }
+        (*lm)[c] = NULL;
+
+        return unique;
+}
+
+/* return 0 if LDAPMods match, else 1 */
+int compare_LDAPMod(LDAPMod **lm0, LDAPMod **lm1)
+{
+        int i, j;
+        int rc = 0;
+        char *t0, *t1, **v0, **v1;
+        const int depth = 65535;
+
+        if (lm0 == NULL && lm1 == NULL) return 0;
+        if (lm0 == NULL || lm1 == NULL) return 1;
+
+        for (i = 0; i < depth; i++) {
+                if (lm0[i] == NULL || lm1[i] == NULL) break;
+                t0 = lm0[i]->mod_type;
+                t1 = lm1[i]->mod_type;
+                v0 = lm0[i]->mod_values;
+                v1 = lm1[i]->mod_values;
+                if (t0 == NULL && t1 == NULL) break;
+                if (t0 == NULL || t1 == NULL) return 1;
+                for (j = 0; j < depth; j++) {
+                        if (strcmp(t0, t1) != 0) return 1;
+                        if (v0[j] == NULL && v1[j] == NULL) break;
+                        if (v0[j] == NULL || v1[j] == NULL) return 1;
+                        if (strcmp(v0[j], v1[j]) != 0) return 1;
+                }
+                if (j == depth) return 1;
+        }
+        if (i == depth) return 1;
+
+        return rc;
 }
 
 /* test credentials against ldap */
