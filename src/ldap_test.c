@@ -203,11 +203,11 @@ int ldap_test_keyval_to_LDAPMod()
         /* compare LDAPMods */
         if (lm == NULL) {
                 rc = 1;
-                goto ldap_test_keyval_to_LDAPMod_cleanup;
+                goto cleanup;
         }
         rc = compare_LDAPMod(l0, lm);
 
-ldap_test_keyval_to_LDAPMod_cleanup:
+cleanup:
         ldap_mods_free(lm, 1);
 
         return rc;
