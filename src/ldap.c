@@ -153,6 +153,10 @@ int db_insert_ldap(db_t *db, char *resource, keyval_t *data)
 {
         LDAPMod **lmod;
         int rc;
+	char *dn;
+
+	/* build dn from first key, view and ldap base */
+	asprintf(&dn, "%s=%s,%s,%s", data->key, data->value, resource, db->db);
 
         rc = keyval_to_LDAPMod(data, &lmod);
         if (rc == 0) {
@@ -163,11 +167,12 @@ int db_insert_ldap(db_t *db, char *resource, keyval_t *data)
         if (rc != 0) goto db_insert_ldap_cleanup;
         rc = ldap_simple_bind_s(db->conn, db->user, db->pass);
         if (rc != 0) goto db_insert_ldap_cleanup;
-        rc = ldap_add_s(db->conn, resource, lmod);
+        rc = ldap_add_s(db->conn, dn, lmod);
 
 db_insert_ldap_cleanup:
         db_disconnect_ldap(db);
         ldap_mods_free(lmod, 1);
+	free(dn);
         return (rc == LDAP_SUCCESS) ? 0 : 1;
 }
 
