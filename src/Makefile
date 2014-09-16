@@ -23,6 +23,7 @@ CFLAGS := -g -Wall -Werror
 
 # include if defined
 DB_LDAP := 1 # ldap
+DB_LDIF := 1 # ldif
 DB_MY := 1   # mysql
 DB_PG := 1   # postgresql
 DB_TDS := 1  # freetds
@@ -38,6 +39,14 @@ ifdef DB_LDAP
 	HEADERFILES := $(HEADERFILES) ldap.h
 else
 	CFLAGS := $(CFLAGS) -D_NLDAP
+endif
+
+ifdef DB_LDIF
+	LIBS := $(LIBS) -llber
+	OBJECTFILES := $(OBJECTFILES) ldif.o
+	HEADERFILES := $(HEADERFILES) ldif.h
+else
+	CFLAGS := $(CFLAGS) -D_NLDIF
 endif
 
 ifdef DB_MY
@@ -79,6 +88,11 @@ db.o: db.c db.h
 ifdef DB_LDAP
 ldap.o: ldap.c ldap.h
 	${CC} $(CFLAGS) -fpic $(INCLUDES) -c ldap.c $(LIBS)
+endif
+
+ifdef DB_LDIF
+ldif.o: ldif.c ldif.h
+	${CC} $(CFLAGS) -fpic $(INCLUDES) -c ldif.c $(LIBS)
 endif
 
 ifdef DB_MY
