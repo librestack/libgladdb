@@ -53,7 +53,7 @@ int process_ldif(db_t *db, LDIFFP *fp)
 		rc = ldif_read_record(fp, &linenum, &bufp, &buflen);
 		if (rc == 0) {
 			syslog(LOG_DEBUG, "EOF reached for ldif data");
-			return 0;
+			return 1;
 		}
 		else if (rc == -1) {
 			syslog(LOG_ERR, "error reading ldif record");
@@ -95,6 +95,7 @@ int process_ldif(db_t *db, LDIFFP *fp)
 		else {
 			syslog(LOG_DEBUG, "ldif record skipped");
 		}
+		if (rc != 0) return 0;
 	}
 
 	return 1;
