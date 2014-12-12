@@ -80,8 +80,10 @@ int db_exec_sql_pg(db_t *db, char *sql)
         res = PQexec(db->conn, sql);
         int status = PQresultStatus(res);
         if (status != PGRES_TUPLES_OK && status != PGRES_COMMAND_OK) {
+                dberrcode = PQresultErrorField(res, PG_DIAG_SQLSTATE);
+                dberror = PQerrorMessage(db->conn);
                 syslog(LOG_ERR,
-                       "SQL exec failed: %s", PQerrorMessage(db->conn));
+                       "SQL exec failed: %s", dberror);
                 PQclear(res);
                 return -1;
         }
@@ -113,8 +115,9 @@ int db_fetch_all_pg(db_t *db, char *sql, field_t *filter, row_t **rows,
         res = PQexec(db->conn, sql);
         int status = PQresultStatus(res);
         if (status != PGRES_TUPLES_OK && status != PGRES_COMMAND_OK) {
-                syslog(LOG_ERR, "query failed: %s",
-                        PQerrorMessage(db->conn));
+                dberrcode = PQresultErrorField(res, PG_DIAG_SQLSTATE);
+                dberror = PQerrorMessage(db->conn);
+                syslog(LOG_ERR, "query failed: %s", dberror);
                 return -1;
         }
 

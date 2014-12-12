@@ -51,6 +51,9 @@
  */
 int db_connect(db_t *db)
 {
+        dberrcode = NULL;
+        dberror = NULL;
+
         if (db == NULL) {
                 syslog(LOG_ERR, "No database info supplied to db_connect()\n");
                 return -1;
@@ -84,6 +87,9 @@ int db_connect(db_t *db)
 /* wrapper for the database-specific db creation functions */
 int db_create(db_t *db)
 {
+        dberrcode = NULL;
+        dberror = NULL;
+
         if (db == NULL) {
                 fprintf(stderr,
                         "No database info supplied to db_create()\n");
@@ -103,6 +109,9 @@ int db_create(db_t *db)
 /* wrapper for the database-specific disconnect functions */
 int db_disconnect(db_t *db)
 {
+        dberrcode = NULL;
+        dberror = NULL;
+
         if (db == NULL) {
                 fprintf(stderr,
                         "No database info supplied to db_disconnect()\n");
@@ -142,6 +151,8 @@ int db_disconnect(db_t *db)
 int db_exec_sql(db_t *db, char *sql)
 {
         int isconn = 0;
+        dberrcode = NULL;
+        dberror = NULL;
 
         if (db == NULL) {
                 fprintf(stderr,
@@ -188,6 +199,9 @@ int db_exec_sql(db_t *db, char *sql)
  * wrapper for db-specific functions */
 int db_fetch_all(db_t *db, char *sql, field_t *filter, row_t **rows, int *rowc)
 {
+        dberrcode = NULL;
+        dberror = NULL;
+
         if (db == NULL) {
                 syslog(LOG_ERR,
                         "No database info supplied to db_fetch_all()\n");
@@ -222,6 +236,9 @@ int db_fetch_all(db_t *db, char *sql, field_t *filter, row_t **rows, int *rowc)
 /* database agnostic resource insertion */
 int db_insert(db_t *db, char *resource, keyval_t *data)
 {
+        dberrcode = NULL;
+        dberror = NULL;
+
         if (db == NULL) {
                 syslog(LOG_ERR,
                         "No database info supplied to db_insert()\n");
@@ -255,6 +272,9 @@ int db_insert_sql(db_t *db, char *resource, keyval_t *data)
         char quot = '\'';
         int rval;
         int isconn = 0;
+
+        dberrcode = NULL;
+        dberror = NULL;
 
         /* use backticks to quote mysql */
         if (strcmp(db->type, "my") == 0)
@@ -306,6 +326,8 @@ int db_insert_sql(db_t *db, char *resource, keyval_t *data)
 field_t * db_field(row_t *row, char *fname)
 {
         field_t *f;
+        dberrcode = NULL;
+        dberror = NULL;
 
         f = row->fields;
         while (f != NULL) {
@@ -322,6 +344,9 @@ void db_free(db_t *dbs)
 {
         db_t *d;
         db_t *tmp;
+
+        dberrcode = NULL;
+        dberror = NULL;
 
         d = dbs;
         while (d != NULL) {
@@ -343,6 +368,9 @@ db_t *db_get(db_t *dbs, char *alias)
 {
         db_t *db;
 
+        dberrcode = NULL;
+        dberror = NULL;
+
         db = dbs;
         while (db != NULL) {
                 if (strcmp(alias, db->alias) == 0)
@@ -356,6 +384,9 @@ db_t *db_get(db_t *dbs, char *alias)
 /* free field_t struct */
 void free_fields(field_t *f)
 {
+        dberrcode = NULL;
+        dberror = NULL;
+
         field_t *next_f = NULL;
         while (f != NULL) {
                 free(f->fname);
@@ -369,6 +400,9 @@ void free_fields(field_t *f)
 /* free row_t struct */
 void liberate_rows(row_t *r)
 {
+        dberrcode = NULL;
+        dberror = NULL;
+
         row_t *next_r = NULL;
         while (r != NULL) {
                 free_fields(r->fields);
@@ -382,6 +416,9 @@ void liberate_rows(row_t *r)
 int count_keyvals(keyval_t *kv, int *total, int *unique)
 {
         char *last = kv->key;
+        dberrcode = NULL;
+        dberror = NULL;
+
         if (kv != NULL) (*unique) = 1;
         while (kv != NULL) {
                 if (strcmp(last, kv->key) != 0) {

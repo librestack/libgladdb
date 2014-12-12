@@ -51,6 +51,9 @@ typedef struct row_t {
         struct row_t *next;
 } row_t;
 
+char *dberrcode; /* database error code */
+char *dberror;   /* database error message */
+
 int count_keyvals(keyval_t *kv, int *total, int *unique);
 int db_connect(db_t *db);
 int db_create(db_t *db);
