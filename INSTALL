@@ -1,5 +1,10 @@
 INSTALL
 
+cd src
+./configure
+make
+make install
+
 == Ubuntu 14.04 LTS ("Trusty") ==
 
 # install required libraries

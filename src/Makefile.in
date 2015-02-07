@@ -2,7 +2,7 @@
 # 
 # this file is part of GLADDB
 # 
-# Copyright (c) 2012, 2013, 2014 Brett Sheffield <brett@gladserv.com>
+# Copyright (c) 2012-2015 Brett Sheffield <brett@gladserv.com>
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,19 +21,19 @@
 CC=gcc
 CFLAGS := -g -Wall -Werror
 
-# include if defined
-DB_LDAP := 1 # ldap
-DB_LDIF := 1 # ldif
-DB_MY := 1   # mysql
-DB_PG := 1   # postgresql
-DB_TDS := 1  # freetds
+# include if = 1
+DB_LDAP := @ldap@ # ldap
+DB_LDIF := @ldif@ # ldif
+DB_MY := @mysql@  # mysql
+DB_PG := @postgres@ # postgresql
+DB_TDS := @freetds@ # freetds
 
 INCLUDES :=
 LIBS :=-L/usr/lib/x86_64-linux-gnu
 OBJECTFILES :=db.o
 HEADERFILES :=db.h
 
-ifdef DB_LDAP
+ifeq (DB_LDAP,1)
 	LIBS := $(LIBS) -lldap
 	OBJECTFILES := $(OBJECTFILES) ldap.o
 	HEADERFILES := $(HEADERFILES) ldap.h
@@ -41,7 +41,7 @@ else
 	CFLAGS := $(CFLAGS) -D_NLDAP
 endif
 
-ifdef DB_LDIF
+ifeq (DB_LDIF,1)
 	LIBS := $(LIBS) -llber
 	OBJECTFILES := $(OBJECTFILES) ldif.o
 	HEADERFILES := $(HEADERFILES) ldif.h
@@ -49,7 +49,7 @@ else
 	CFLAGS := $(CFLAGS) -D_NLDIF
 endif
 
-ifdef DB_MY
+ifeq (DB_MY,1)
 	LIBS := $(LIBS) `mysql_config --cflags --libs` -lmysqlclient
 	OBJECTFILES := $(OBJECTFILES) my.o
 	HEADERFILES := $(HEADERFILES) my.h
@@ -57,7 +57,7 @@ else
 	CFLAGS := $(CFLAGS) -D_NMY
 endif
 
-ifdef DB_PG
+ifeq (DB_PG,1)
 	INCLUDES := $(INCLUDES) -I/usr/include/postgresql
 	LIBS := $(LIBS) -lpq
 	OBJECTFILES := $(OBJECTFILES) pg.o
@@ -66,7 +66,7 @@ else
 	CFLAGS := $(CFLAGS) -D_NPG
 endif
 
-ifdef DB_TDS
+ifeq (DB_TDS,1)
 	LIBS := $(LIBS) -lsybdb
 	OBJECTFILES := $(OBJECTFILES) tds.o
 	HEADERFILES := $(HEADERFILES) tds.h

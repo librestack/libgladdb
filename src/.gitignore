@@ -2,3 +2,4 @@
 *.so.*
 *.swp
 cov-int/*
+autom4te.cache/
