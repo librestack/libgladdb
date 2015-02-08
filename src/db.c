@@ -24,19 +24,19 @@
 #define LDAP_DEPRECATED 1
 #include "db.h"
 
-#ifndef D_NLDAP
+#ifndef _NLDAP
 #include "ldap.h"
 #endif
 
-#ifndef D_NMY
+#ifndef _NMY
 #include "my.h"
 #endif
 
-#ifndef D_NPG
+#ifndef _NPG
 #include "pg.h"
 #endif
 
-#ifndef D_NTDS
+#ifndef _NTDS
 #include "tds.h"
 #endif
 
