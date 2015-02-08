@@ -1,4 +1,4 @@
-# configure.ac for gladd
+# configure.ac for libgladdb
 # 
 # this file is part of GLADDB
 # 
