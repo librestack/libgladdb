@@ -95,9 +95,11 @@ int db_create(db_t *db)
                         "No database info supplied to db_create()\n");
                 return -1;
         }
+#ifndef _NPG
         if (strcmp(db->type, "pg") == 0) {
                 return db_create_pg(db);
         }
+#endif
         else {
                 fprintf(stderr,
                     "Invalid database type '%s' passed to db_create()\n",
