@@ -124,7 +124,7 @@ test: clean $(OBJECTFILES)
 	@echo "Tests complete."
 
 ${INCLUDEDIR}:
-	mkdir ${INCLUDEDIR}
+	mkdir -p ${INCLUDEDIR}
 
 install: ${LIBFILE}.1.0 | ${INCLUDEDIR}
 	cp ${LIBFILE}.1.0 ${LIBDIR}
