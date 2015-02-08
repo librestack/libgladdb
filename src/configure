@@ -684,6 +684,11 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+with_ldif
+with_mysql
+with_openldap
+with_postgres
+with_tds
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1298,6 +1303,15 @@ if test -n "$ac_init_help"; then
      short | recursive ) echo "Configuration of libgladdb 0.2.7:";;
    esac
   cat <<\_ACEOF
+
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+ --without-ldif disable ldif
+ --without-mysql disable mysql
+ --without-openldap disable openldap
+ --without-postgres disable postgres
+ --without-tds disable tds support
 
 Some influential environment variables:
   CC          C compiler command
@@ -3530,6 +3544,37 @@ fi
 done
 
 
+
+# Check whether --with-ldif was given.
+if test "${with_ldif+set}" = set; then :
+  withval=$with_ldif;
+fi
+
+
+# Check whether --with-mysql was given.
+if test "${with_mysql+set}" = set; then :
+  withval=$with_mysql;
+fi
+
+
+# Check whether --with-openldap was given.
+if test "${with_openldap+set}" = set; then :
+  withval=$with_openldap;
+fi
+
+
+# Check whether --with-postgres was given.
+if test "${with_postgres+set}" = set; then :
+  withval=$with_postgres;
+fi
+
+
+# Check whether --with-tds was given.
+if test "${with_tds+set}" = set; then :
+  withval=$with_tds;
+fi
+
+
 ldap=0
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ldap_initialize in -lldap" >&5
 $as_echo_n "checking for ldap_initialize in -lldap... " >&6; }
@@ -3573,6 +3618,10 @@ else
   ldap=0
 fi
 
+if test "$with_openldap" == "no"
+then
+        ldap=0
+fi
 ldap=$ldap
 
 if test "$ldap" == "0"
@@ -3624,6 +3673,10 @@ else
   ldif=0
 fi
 
+if test "$with_ldif" == "no"
+then
+        ldif=0
+fi
 ldif=$ldif
 
 if test "$ldif" == "0"
@@ -3675,6 +3728,10 @@ else
   mysql=0
 fi
 
+if test "$with_mysql" == "no"
+then
+        mysql=0
+fi
 mysql=$mysql
 
 if test "$mysql" == "0"
@@ -3726,6 +3783,10 @@ else
   postgres=0
 fi
 
+if test "$with_postgres" == "no"
+then
+        postgres=0
+fi
 postgres=$postgres
 
 if test "$postgres" == "0"
@@ -3777,6 +3838,10 @@ else
   freetds=0
 fi
 
+if test "$with_freetds" == "no"
+then
+        freetds=0
+fi
 freetds=$freetds
 
 if test "$freetds" == "0"

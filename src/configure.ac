@@ -33,8 +33,18 @@ AC_FUNC_MALLOC
 
 AC_CHECK_HEADERS([stdio.h stdlib.h string.h syslog.h])
 
+AC_ARG_WITH(ldif, [ --without-ldif disable ldif])
+AC_ARG_WITH(mysql, [ --without-mysql disable mysql])
+AC_ARG_WITH(openldap, [ --without-openldap disable openldap])
+AC_ARG_WITH(postgres, [ --without-postgres disable postgres])
+AC_ARG_WITH(tds, [ --without-tds disable tds support])
+
 ldap=0
 AC_CHECK_LIB([ldap], [ldap_initialize], [ldap=1] , [ldap=0])
+if test "$with_openldap" == "no"
+then
+        ldap=0
+fi
 AC_SUBST(ldap, $ldap)
 if test "$ldap" == "0"
 then
@@ -43,6 +53,10 @@ fi
 
 ldif=0
 AC_CHECK_LIB([ldif], [ldap_parse_ldif_record], [ldif=1] , [ldif=0])
+if test "$with_ldif" == "no"
+then
+        ldif=0
+fi
 AC_SUBST(ldif, $ldif)
 if test "$ldif" == "0"
 then
@@ -51,6 +65,10 @@ fi
 
 mysql=0
 AC_CHECK_LIB([mysql], [mysql_init], [mysql=1] , [mysql=0])
+if test "$with_mysql" == "no"
+then
+        mysql=0
+fi
 AC_SUBST(mysql, $mysql)
 if test "$mysql" == "0"
 then
@@ -59,6 +77,10 @@ fi
 
 postgres=0
 AC_CHECK_LIB([libpq-fe], [PQconnectdb], [postgres=1] , [postgres=0])
+if test "$with_postgres" == "no"
+then
+        postgres=0
+fi
 AC_SUBST(postgres, $postgres)
 if test "$postgres" == "0"
 then
@@ -67,6 +89,10 @@ fi
 
 freetds=0
 AC_CHECK_LIB([sybdb], [dbinit], [freetds=1] , [freetds=0])
+if test "$with_freetds" == "no"
+then
+        freetds=0
+fi
 AC_SUBST(freetds, $freetds)
 if test "$freetds" == "0"
 then
