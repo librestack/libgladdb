@@ -80,7 +80,7 @@ LIBNAME=gladdb
 LIBFILE=lib${LIBNAME}.so
 
 ${LIBFILE}.1.0: $(OBJECTFILES)
-	${CC} $(CFLAGS) -shared -Wl,-soname,${LIBFILE}.1 -o ${LIBFILE}.1.0 $(OBJECTFILES)
+	${CC} $(CFLAGS) -shared -Wl,-soname,${LIBFILE}.1 -o ${LIBFILE}.1.0 $(OBJECTFILES) $(LIBS)
 
 db.o: db.c db.h
 	${CC} $(CFLAGS) -fpic $(INCLUDES) -c db.c $(LIBS)
