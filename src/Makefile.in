@@ -31,7 +31,7 @@ DB_TDS := @freetds@ # freetds
 INCLUDES :=
 LIBS :=-L/usr/lib/x86_64-linux-gnu
 OBJECTFILES :=db.o
-HEADERFILES :=db.h
+HEADERFILES :=*.h
 
 ifeq (DB_LDAP,1)
 	LIBS := $(LIBS) -lldap
