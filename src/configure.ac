@@ -21,7 +21,7 @@
 # To build configure script:
 #   autoconf configure.ac > configure
 
-AC_INIT([libgladdb], [0.2.9], [brett@gladserv.com])
+AC_INIT([libgladdb], [0.2.10], [brett@gladserv.com])
 AC_PROG_CC
 AC_LANG(C)
 AC_PREFIX_DEFAULT([/usr/local/bin])
