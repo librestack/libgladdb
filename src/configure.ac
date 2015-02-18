@@ -76,7 +76,7 @@ then
 fi
 
 postgres=0
-AC_CHECK_LIB([libpq-fe], [PQconnectdb], [postgres=1] , [postgres=0])
+AC_CHECK_LIB([pq], [PQconnectdb], [postgres=1] , [postgres=0])
 if test "$with_postgres" == "no"
 then
         postgres=0

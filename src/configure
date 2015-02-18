@@ -3741,13 +3741,13 @@ $as_echo "$as_me: disabling mysql/mariadb support" >&6;}
 fi
 
 postgres=0
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for PQconnectdb in -llibpq-fe" >&5
-$as_echo_n "checking for PQconnectdb in -llibpq-fe... " >&6; }
-if ${ac_cv_lib_libpq_fe_PQconnectdb+:} false; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for PQconnectdb in -lpq" >&5
+$as_echo_n "checking for PQconnectdb in -lpq... " >&6; }
+if ${ac_cv_lib_pq_PQconnectdb+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-llibpq-fe  $LIBS"
+LIBS="-lpq  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -3767,17 +3767,17 @@ return PQconnectdb ();
 }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_libpq_fe_PQconnectdb=yes
+  ac_cv_lib_pq_PQconnectdb=yes
 else
-  ac_cv_lib_libpq_fe_PQconnectdb=no
+  ac_cv_lib_pq_PQconnectdb=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_libpq_fe_PQconnectdb" >&5
-$as_echo "$ac_cv_lib_libpq_fe_PQconnectdb" >&6; }
-if test "x$ac_cv_lib_libpq_fe_PQconnectdb" = xyes; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_pq_PQconnectdb" >&5
+$as_echo "$ac_cv_lib_pq_PQconnectdb" >&6; }
+if test "x$ac_cv_lib_pq_PQconnectdb" = xyes; then :
   postgres=1
 else
   postgres=0
