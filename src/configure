@@ -625,7 +625,7 @@ ac_includes_default="\
 ac_subst_vars='LTLIBOBJS
 freetds
 postgres
-mysqlclient
+mysql
 ldif
 ldap
 LIBOBJS
@@ -3686,13 +3686,13 @@ $as_echo "$as_me: disabling ldif support" >&6;}
 fi
 
 mysql=0
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for mysql_init in -lmysql" >&5
-$as_echo_n "checking for mysql_init in -lmysql... " >&6; }
-if ${ac_cv_lib_mysql_mysql_init+:} false; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for mysql_init in -lmysqlclient" >&5
+$as_echo_n "checking for mysql_init in -lmysqlclient... " >&6; }
+if ${ac_cv_lib_mysqlclient_mysql_init+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lmysql  $LIBS"
+LIBS="-lmysqlclient  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -3712,17 +3712,17 @@ return mysql_init ();
 }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_mysql_mysql_init=yes
+  ac_cv_lib_mysqlclient_mysql_init=yes
 else
-  ac_cv_lib_mysql_mysql_init=no
+  ac_cv_lib_mysqlclient_mysql_init=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_mysql_mysql_init" >&5
-$as_echo "$ac_cv_lib_mysql_mysql_init" >&6; }
-if test "x$ac_cv_lib_mysql_mysql_init" = xyes; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_mysqlclient_mysql_init" >&5
+$as_echo "$ac_cv_lib_mysqlclient_mysql_init" >&6; }
+if test "x$ac_cv_lib_mysqlclient_mysql_init" = xyes; then :
   mysql=1
 else
   mysql=0
@@ -3732,7 +3732,7 @@ if test "$with_mysql" == "no"
 then
         mysql=0
 fi
-mysqlclient=$mysql
+mysql=$mysql
 
 if test "$mysql" == "0"
 then

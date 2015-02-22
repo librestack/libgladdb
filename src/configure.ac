@@ -64,12 +64,12 @@ then
 fi
 
 mysql=0
-AC_CHECK_LIB([mysql], [mysql_init], [mysql=1] , [mysql=0])
+AC_CHECK_LIB([mysqlclient], [mysql_init], [mysql=1] , [mysql=0])
 if test "$with_mysql" == "no"
 then
         mysql=0
 fi
-AC_SUBST(mysqlclient, $mysql)
+AC_SUBST(mysql, $mysql)
 if test "$mysql" == "0"
 then
         AC_MSG_NOTICE([disabling mysql/mariadb support])
