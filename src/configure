@@ -625,7 +625,7 @@ ac_includes_default="\
 ac_subst_vars='LTLIBOBJS
 freetds
 postgres
-mysql
+mysqlclient
 ldif
 ldap
 LIBOBJS
@@ -3732,7 +3732,7 @@ if test "$with_mysql" == "no"
 then
         mysql=0
 fi
-mysql=$mysql
+mysqlclient=$mysql
 
 if test "$mysql" == "0"
 then

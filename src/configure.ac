@@ -69,7 +69,7 @@ if test "$with_mysql" == "no"
 then
         mysql=0
 fi
-AC_SUBST(mysql, $mysql)
+AC_SUBST(mysqlclient, $mysql)
 if test "$mysql" == "0"
 then
         AC_MSG_NOTICE([disabling mysql/mariadb support])
