@@ -3,3 +3,5 @@
 *.swp
 cov-int/*
 autom4te.cache/
+Makefile
+config.*
