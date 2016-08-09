@@ -52,7 +52,7 @@ then
 fi
 
 ldif=0
-AC_CHECK_LIB([ldif], [ldap_parse_ldif_record], [ldif=1] , [ldif=0])
+AC_CHECK_LIB([ldap], [ldap_parse_ldif_record], [ldif=1] , [ldif=0])
 if test "$with_ldif" == "no"
 then
         ldif=0
