@@ -1,4 +1,4 @@
-# gladdb
+# libgladdb
 
 Used by gladd and gladbooks for database access.
 
