@@ -3,6 +3,8 @@
 # this file is part of GLADDB
 # 
 # Copyright (c) 2012-2015 Brett Sheffield <brett@gladserv.com>
+# Copyright (c) 2017 Gavin Henry <ghenry@suretec.co.uk>, Suretec 
+#  Systems Ltd. T/A SureVoIP
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,6 +29,7 @@ DB_LDIF := @ldif@
 DB_MY := @mysql@
 DB_PG := @postgres@
 DB_TDS := @freetds@
+DB_LMDB := @lmdb@
 
 INCLUDES :=
 LIBS :=-L/usr/lib/x86_64-linux-gnu
@@ -74,6 +77,14 @@ else
 	CFLAGS := $(CFLAGS) -D_NTDS
 endif
 
+ifeq ($(DB_LMDB),1)
+	LIBS := $(LIBS) -llmdb
+	OBJECTFILES := $(OBJECTFILES) lmdb.o
+	HEADERFILES := $(HEADERFILES) lmdb.h
+else
+	CFLAGS := $(CFLAGS) -D_NLMDB
+endif
+
 LIBDIR=/usr/local/lib
 INCLUDEDIR=/usr/local/include/${LIBNAME}/
 LIBNAME=gladdb
@@ -100,17 +111,25 @@ pg.o: pg.c pg.h
 tds.o: tds.c tds.h
 	${CC} $(CFLAGS) -fpic $(INCLUDES) -c tds.c $(LIBS)
 
+lmdb.o: lmdb.c lmdb.h
+	${CC} $(CFLAGS) -fpic $(INCLUDES) -c lmdb.c $(LIBS)
+
 .PHONY: clean test
 
 clean:
 	rm -f *.so*
 	rm -f *.o
 	rm -f ${LIBNAME}_test_ldap
+	rm -f ${LIBNAME}_test_lmdb
+	rm -f ${LIBNAME}_test_lmdb_db
+	rm -f ${LIBNAME}_test_lmdb_db-lock
 
 test: clean $(OBJECTFILES)
 	${CC} $(CFLAGS) ${INCLUDES} -o ${LIBNAME}_test_ldap ldap_test.c $(OBJECTFILES) $(LIBS)
+	${CC} $(CFLAGS) ${INCLUDES} -o ${LIBNAME}_test_lmdb lmdb_test.c $(OBJECTFILES) $(LIBS)
 	@echo "Running tests..."
 	@./${LIBNAME}_test_ldap || echo "LDAP test failed"
+	@./${LIBNAME}_test_lmdb || echo "LMDB test failed"
 	@echo "Tests complete."
 
 ${INCLUDEDIR}:

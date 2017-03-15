@@ -3,6 +3,8 @@
 # this file is part of GLADDB
 # 
 # Copyright (c) 2015-2016 Brett Sheffield <brett@gladserv.com>
+# Copyright (c) 2017 Gavin Henry <ghenry@suretec.co.uk>, Suretec 
+#  Systems Ltd. T/A SureVoIP
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,6 +40,7 @@ AC_ARG_WITH(mysql, [ --without-mysql disable mysql])
 AC_ARG_WITH(openldap, [ --without-openldap disable openldap])
 AC_ARG_WITH(postgres, [ --without-postgres disable postgres])
 AC_ARG_WITH(tds, [ --without-tds disable tds support])
+AC_ARG_WITH(lmdb, [ --without-lmdb disable lmdb support])
 
 ldap=0
 AC_CHECK_LIB([ldap], [ldap_initialize], [ldap=1] , [ldap=0])
@@ -97,6 +100,18 @@ AC_SUBST(freetds, $freetds)
 if test "$freetds" == "0"
 then
         AC_MSG_NOTICE([disabling freetds support])
+fi
+
+lmdb=0
+AC_CHECK_LIB([lmdb], [mdb_env_create], [lmdb=1] , [lmdb=0])
+if test "$with_lmdb" == "no"
+then
+        lmdb=0
+fi
+AC_SUBST(lmdb, $lmdb)
+if test "$lmdb" == "0"
+then
+        AC_MSG_NOTICE([disabling lmdb support])
 fi
 
 
