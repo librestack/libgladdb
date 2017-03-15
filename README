@@ -2,4 +2,4 @@ libgladdb
 
 Used by gladd and gladbooks for database access.
 
-Supports postgresql, mysql, ldap and tds databases.
+Supports postgresql, mysql, ldap, lmdb and tds databases.

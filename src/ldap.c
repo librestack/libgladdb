@@ -52,7 +52,7 @@ int db_connect_ldap(db_t *db)
         return 0;
 }
 
-/* disconnect from a mysql db */
+/* disconnect from a ldap directory */
 int db_disconnect_ldap(db_t *db)
 {
         if (db->conn != NULL) {
