@@ -5,3 +5,5 @@ cov-int/*
 autom4te.cache/
 Makefile
 config.*
+*test_lmdb*
+*test_ldap*

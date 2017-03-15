@@ -623,6 +623,7 @@ ac_includes_default="\
 #endif"
 
 ac_subst_vars='LTLIBOBJS
+lmdb
 freetds
 postgres
 mysql
@@ -689,6 +690,7 @@ with_mysql
 with_openldap
 with_postgres
 with_tds
+with_lmdb
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1312,6 +1314,7 @@ Optional Packages:
  --without-openldap disable openldap
  --without-postgres disable postgres
  --without-tds disable tds support
+ --without-lmdb disable lmdb support
 
 Some influential environment variables:
   CC          C compiler command
@@ -3575,6 +3578,12 @@ if test "${with_tds+set}" = set; then :
 fi
 
 
+# Check whether --with-lmdb was given.
+if test "${with_lmdb+set}" = set; then :
+  withval=$with_lmdb;
+fi
+
+
 ldap=0
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ldap_initialize in -lldap" >&5
 $as_echo_n "checking for ldap_initialize in -lldap... " >&6; }
@@ -3848,6 +3857,61 @@ if test "$freetds" == "0"
 then
         { $as_echo "$as_me:${as_lineno-$LINENO}: disabling freetds support" >&5
 $as_echo "$as_me: disabling freetds support" >&6;}
+fi
+
+lmdb=0
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for mdb_env_create in -llmdb" >&5
+$as_echo_n "checking for mdb_env_create in -llmdb... " >&6; }
+if ${ac_cv_lib_lmdb_mdb_env_create+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-llmdb  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char mdb_env_create ();
+int
+main ()
+{
+return mdb_env_create ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_lmdb_mdb_env_create=yes
+else
+  ac_cv_lib_lmdb_mdb_env_create=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_lmdb_mdb_env_create" >&5
+$as_echo "$ac_cv_lib_lmdb_mdb_env_create" >&6; }
+if test "x$ac_cv_lib_lmdb_mdb_env_create" = xyes; then :
+  lmdb=1
+else
+  lmdb=0
+fi
+
+if test "$with_lmdb" == "no"
+then
+        lmdb=0
+fi
+lmdb=$lmdb
+
+if test "$lmdb" == "0"
+then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: disabling lmdb support" >&5
+$as_echo "$as_me: disabling lmdb support" >&6;}
 fi
 
 

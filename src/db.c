@@ -4,6 +4,8 @@
  * this file is part of GLADDB
  *
  * Copyright (c) 2012, 2013, 2014 Brett Sheffield <brett@gladserv.com>
+ * Copyright (c) 2017 Gavin Henry <ghenry@suretec.co.uk>, Suretec 
+ *  Systems Ltd. T/A SureVoIP
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,6 +42,10 @@
 #include "tds.h"
 #endif
 
+#ifndef _NLMDB
+#include "lmdb.h"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -58,9 +64,9 @@ int db_connect(db_t *db)
                 syslog(LOG_ERR, "No database info supplied to db_connect()\n");
                 return -1;
         }
-#ifndef _NPG
-        if (strcmp(db->type, "pg") == 0) {
-                return db_connect_pg(db);
+#ifndef _NLDAP
+        if (strcmp(db->type, "ldap") == 0) {
+                return db_connect_ldap(db);
         }
 #endif
 #ifndef _NMY
@@ -68,14 +74,19 @@ int db_connect(db_t *db)
                 return db_connect_my(db);
         }
 #endif
+#ifndef _NPG
+        if (strcmp(db->type, "pg") == 0) {
+                return db_connect_pg(db);
+        }
+#endif
 #ifndef _NTDS
         if (strcmp(db->type, "tds") == 0) {
                 return db_connect_tds(db);
         }
 #endif
-#ifndef _NLDAP
-        if (strcmp(db->type, "ldap") == 0) {
-                return db_connect_ldap(db);
+#ifndef _NLMDB
+        if (strcmp(db->type, "lmdb") == 0) {
+                return db_connect_lmdb(db);
         }
 #endif
         syslog(LOG_ERR,
@@ -122,9 +133,9 @@ int db_disconnect(db_t *db)
         if (db->conn == NULL) {
                 return 0;
         }
-#ifndef _NPG
-        if (strcmp(db->type, "pg") == 0) {
-                return db_disconnect_pg(db);
+#ifndef _NLDAP
+        if (strcmp(db->type, "ldap") == 0) {
+                return db_disconnect_ldap(db);
         }
 #endif
 #ifndef _NMY
@@ -132,14 +143,19 @@ int db_disconnect(db_t *db)
                 return db_disconnect_my(db);
         }
 #endif
+#ifndef _NPG
+        if (strcmp(db->type, "pg") == 0) {
+                return db_disconnect_pg(db);
+        }
+#endif
 #ifndef _NTDS
         if (strcmp(db->type, "tds") == 0) {
                 return db_disconnect_tds(db);
         }
 #endif
-#ifndef _NLDAP
-        if (strcmp(db->type, "ldap") == 0) {
-                return db_disconnect_ldap(db);
+#ifndef _NLMDB
+        if (strcmp(db->type, "lmdb") == 0) {
+                return db_disconnect_lmdb(db);
         }
 #endif
         fprintf(stderr,
@@ -229,6 +245,11 @@ int db_fetch_all(db_t *db, char *sql, field_t *filter, row_t **rows, int *rowc)
                 return db_fetch_all_ldap(db, sql, filter, rows, rowc);
         }
 #endif
+#ifndef _NLMDB
+        if (strcmp(db->type, "lmdb") == 0) {
+                return db_fetch_all_lmdb(db, sql, filter, rows, rowc);
+        }
+#endif
         syslog(LOG_ERR,
             "Invalid database type '%s' passed to db_fetch_all()\n",
             db->type);
@@ -256,6 +277,11 @@ int db_insert(db_t *db, char *resource, keyval_t *data)
 #ifndef _NLDAP
         if (strcmp(db->type, "ldap") == 0) {
                 return db_insert_ldap(db, resource, data);
+        }
+#endif
+#ifndef _NLMDB
+        if (strcmp(db->type, "lmdb") == 0) {
+                return db_insert_lmdb(db, resource, data);
         }
 #endif
         syslog(LOG_ERR, "Invalid database type '%s' passed to db_insert()\n",
