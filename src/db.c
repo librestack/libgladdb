@@ -1,10 +1,11 @@
-/* 
- * db.c - code to handle database connections etc.
+/** \file db.c 
+ *
+ *  Code to handle database connections etc.
  *
  * this file is part of GLADDB
  *
- * Copyright (c) 2012, 2013, 2014 Brett Sheffield <brett@gladserv.com>
- * Copyright (c) 2017 Gavin Henry <ghenry@suretec.co.uk>, Suretec 
+ * \copyright 2012, 2013, 2014 Brett Sheffield <brett@gladserv.com>
+ * \copyright 2017 Gavin Henry <ghenry@suretec.co.uk>, Suretec 
  *  Systems Ltd. T/A SureVoIP
  *
  * This program is free software: you can redistribute it and/or modify
@@ -51,9 +52,10 @@
 #include <string.h>
 #include <syslog.h>
 
-/* connect to specified database 
- * pointer to the connection is stored in db_t struct 
- * a wrapper for the database-specific functions
+/** Connect to specified database 
+ * \param db A pointer to the connection is stored in db_t struct, 
+ *           a wrapper for the database-specific functions
+ * \return   0 on success, non-zero (-1) on failure
  */
 int db_connect(db_t *db)
 {
@@ -95,7 +97,10 @@ int db_connect(db_t *db)
         return -1;
 }
 
-/* wrapper for the database-specific db creation functions */
+/** Wrapper for the database-specific db creation functions 
+ * \param db A pointer to a db_t struct
+ * \return   0 on success, non-zero (-1) on failure
+ */
 int db_create(db_t *db)
 {
         dberrcode = NULL;
@@ -119,7 +124,10 @@ int db_create(db_t *db)
         return 0;
 }
 
-/* wrapper for the database-specific disconnect functions */
+/** Wrapper for the database-specific db disconnect functions 
+ * \param db A pointer to a db_t struct
+ * \return   0 on success, non-zero (-1) on failure
+ */
 int db_disconnect(db_t *db)
 {
         dberrcode = NULL;
@@ -164,8 +172,11 @@ int db_disconnect(db_t *db)
         return -1;
 }
 
-/* execute some sql on a database
- * wrapper for db-specific functions */
+/** Wrapper for the database-specific db to execute some sql
+ * \param db A pointer to a db_t struct
+ * \param sql A pointer to a string containing your SQL syntax
+ * \return   0 on success, non-zero (-1) on failure
+ */
 int db_exec_sql(db_t *db, char *sql)
 {
         int isconn = 0;
@@ -213,8 +224,14 @@ int db_exec_sql(db_t *db, char *sql)
         return 0;
 }
 
-/* return all results from a SELECT
- * wrapper for db-specific functions */
+/** Wrapper to return all results from an SQL type SELECT function
+ * \param db        A pointer to a db_t struct
+ * \param sql       A pointer to your string containing your SQL syntax
+ * \param filter    A pointer to a field_t to filter your results
+ * \param rows      A pointer to a pointer to process all rows
+ * \param rowc      A int to store total amount of rows
+ * \return   0 on success, non-zero (-1) on failure.
+ */
 int db_fetch_all(db_t *db, char *sql, field_t *filter, row_t **rows, int *rowc)
 {
         dberrcode = NULL;
@@ -256,7 +273,13 @@ int db_fetch_all(db_t *db, char *sql, field_t *filter, row_t **rows, int *rowc)
         return -1;
 }
 
-/* database agnostic resource insertion */
+/** Wrapper to insert/put/add records into a backend database
+ * \param db        A pointer to a db_t struct
+ * \param resource  A pointer to your string containing a resource name
+ * \param data      A pointer to a keyval_t containing your data to
+ *                  insert
+ * \return   0 on success, non-zero (-1) on failure.
+ */
 int db_insert(db_t *db, char *resource, keyval_t *data)
 {
         dberrcode = NULL;
@@ -289,7 +312,13 @@ int db_insert(db_t *db, char *resource, keyval_t *data)
         return -1;
 }
 
-/* INSERT into sql database */
+/** Wrapper to insert SQL into a rdbms 
+ * \param db        A pointer to a db_t struct
+ * \param resource  A pointer to your string containing a resource name
+ * \param data      A pointer to a keyval_t containing your data to
+ *                  insert
+ * \return   0 on success, non-zero (-1) on failure.
+ */
 int db_insert_sql(db_t *db, char *resource, keyval_t *data)
 {
         char *flds = NULL;
@@ -350,7 +379,11 @@ int db_insert_sql(db_t *db, char *resource, keyval_t *data)
         return rval;
 }
 
-/* return field with name fname from provided row */
+/** Return a field with name fname, from provided row 
+ * \param row   A pointer to a db_t struct
+ * \param fname A pointer to your string containing the field name
+ * \return      Pointer to a field_t or NULL if not found
+ */
 field_t * db_field(row_t *row, char *fname)
 {
         field_t *f;
@@ -367,7 +400,10 @@ field_t * db_field(row_t *row, char *fname)
         return '\0';
 }
 
-/* free database struct */
+/** Free database struct 
+ * \param dbs   A pointer to a db_t struct
+ * \return      Nothing
+ */
 void db_free(db_t *dbs)
 {
         db_t *d;
@@ -391,7 +427,11 @@ void db_free(db_t *dbs)
         dbs = NULL;
 }
 
-/* return the db_t pointer for this db alias */
+/** Return the db_t pointer for this db alias
+ * \param dbs   A pointer to a db_t struct
+ * \param alias A pointer to hold the alias returned
+ * \return      Pointer to a db_t or NULL if not found
+ */
 db_t *db_get(db_t *dbs, char *alias)
 {
         db_t *db;
@@ -409,7 +449,10 @@ db_t *db_get(db_t *dbs, char *alias)
         return NULL; /* db not found */
 }
 
-/* free field_t struct */
+/** Free field_t struct 
+ * \param f     A pointer to a field_t struct
+ * \return      Nothing
+ */
 void free_fields(field_t *f)
 {
         dberrcode = NULL;
@@ -425,7 +468,10 @@ void free_fields(field_t *f)
         }
 }
 
-/* free row_t struct */
+/** Free row_t struct
+ * \param r     A pointer to a row_t struct
+ * \return      Nothing
+ */
 void liberate_rows(row_t *r)
 {
         dberrcode = NULL;
@@ -440,7 +486,12 @@ void liberate_rows(row_t *r)
         }
 }
 
-/* count keyvals and return total and unique counts */
+/** Count keyvals and return total, but increment unique counts
+ * \param kv        A pointer to a keyval_t struct to count
+ * \param total     A pointer to an int for your total count
+ * \param unique    A pointer to an int for counting unique items
+ * \return          total keys
+ */
 int count_keyvals(keyval_t *kv, int *total, int *unique)
 {
         char *last = kv->key;
